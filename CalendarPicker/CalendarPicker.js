@@ -33,6 +33,7 @@ var styles = StyleSheet.create(makeStyles(initialScale));
 var Day = React.createClass({
   propTypes: {
     date: React.PropTypes.instanceOf(Date),
+    allowedDays: React.PropTypes.array,
     onDayChange: React.PropTypes.func,
     maxDate: React.PropTypes.instanceOf(Date),
     minDate: React.PropTypes.instanceOf(Date),
@@ -79,7 +80,9 @@ var Day = React.createClass({
         </View>
       );
     } else {
-      if (this.props.date < this.props.minDate || this.props.date > this.props.maxDate) {
+      const isValidDay = this.props.allowedDays && this.props.allowedDays.indexOf(this.props.date.getDay()) > -1;
+
+      if (this.props.date < this.props.minDate || this.props.date > this.props.maxDate || !isValidDay) {
         return (
           <View style={styles.dayWrapper}>
             <Text style={[styles.dayLabel, textStyle, styles.disabledTextColor]}>
@@ -87,7 +90,7 @@ var Day = React.createClass({
             </Text>
           </View>
         );
-      } 
+      }
       else {
         return (
           <View style={styles.dayWrapper}>
@@ -107,6 +110,7 @@ var Day = React.createClass({
 
 var Days = React.createClass({
   propTypes: {
+    allowedDays: React.PropTypes.array,
     maxDate: React.PropTypes.instanceOf(Date),
     minDate: React.PropTypes.instanceOf(Date),
     date: React.PropTypes.instanceOf(Date).isRequired,
@@ -184,6 +188,7 @@ var Days = React.createClass({
                       day={currentDay+1}
                       selected={this.state.selectedStates[currentDay]}
                       date={new Date(year, month, currentDay + 1)}
+                      allowedDays={this.props.allowedDays}
                       maxDate={this.props.maxDate}
                       minDate={this.props.minDate}
                       onDayChange={this.onPressDay}
@@ -367,6 +372,7 @@ var HeaderControls = React.createClass({
 
 var CalendarPicker = React.createClass({
   propTypes: {
+    allowedDays: React.PropTypes.array, // days of the week that are valid (2 - Tuesday, 5 - Friday)
     maxDate: React.PropTypes.instanceOf(Date),
     minDate: React.PropTypes.instanceOf(Date),
     selectedDate: React.PropTypes.instanceOf(Date).isRequired,
@@ -462,6 +468,7 @@ var CalendarPicker = React.createClass({
           textStyle={this.props.textStyle} />
 
         <Days
+          allowedDays={this.props.allowedDays}
           maxDate={this.props.maxDate}
           minDate={this.props.minDate}
           month={this.state.month}
